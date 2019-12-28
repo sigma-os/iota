@@ -40,7 +40,8 @@ following possible values:
 - `uint32`
 - `int64`
 - `uint64`
-- `buffer`: Currently unimplemented
+- `buffer`
+- `string`
 
 And in between the `<field>` and `</field>` nodes the name is placed
 

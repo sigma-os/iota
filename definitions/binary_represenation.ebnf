@@ -2,6 +2,7 @@ byte ::= 8 bit number
 word ::= 16 bit number
 dword ::= 32 bit number
 qword  ::= 64 bit number
+char ::= 8bit ASCII character (bit 7 is always clear)
 
 uint8 ::= byte
 uint16 ::= word
@@ -11,7 +12,10 @@ uint64 ::= qword
 buffer ::= buffer_length, {byte}
 buffer_length ::= qword
 
-entry ::= index, (uint8 | uint16 | uint32 | uint64 | buffer)
+string ::= string_length, {char}
+string_length ::= qword
+
+entry ::= index, (uint8 | uint16 | uint32 | uint64 | buffer | string)
 index ::= byte
 
 table ::= {entry}
