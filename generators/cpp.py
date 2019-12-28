@@ -76,9 +76,8 @@ def generate_c_struct(file, message):
 
 	file.write(f"    }};\n")
 
-def generate(messages, module):
-	file = open('out.hpp', 'w')
-
+def generate(output, messages, module):
+	file = open(output, 'w')
 	
 	file.write("#pragma once\n\n")
 	file.write("#include <stdint.h>\n\n")

@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ElementTree
 import generators.cpp
-import sys;
+import sys
+import argparse
 
 iota_version = '0.0.1'
 iota_messages = []
@@ -26,12 +27,13 @@ class iota_message:
 	fields = []
 
 def main():
-	print(f"Initializing Iota {iota_version}")
+	parser = argparse.ArgumentParser(description='Generate iota files')
+	parser.add_argument('input', help="Select file to generate")
+	parser.add_argument('-g', '--generator', help='Select code generator to use', required=True)
+	parser.add_argument('-o', metavar='OUTPUT', help='Select output file', required=True)
+	args = parser.parse_args()
 
-	assert len(sys.argv) == 2
-	filename = sys.argv[1]
-
-	xmldoc = ElementTree.parse(filename)
+	xmldoc = ElementTree.parse(args.input)
 	
 	root = xmldoc.getroot()
 
@@ -39,8 +41,8 @@ def main():
 		print('No version detected in <iota> statement')
 		exit()
 
-	print(f"    IDL version: {root.attrib['version']}")
-	print(f"    IDL module: {root.attrib['module']}")
+	print(f"IDL version: {root.attrib['version']}")
+	print(f"IDL module: {root.attrib['module']}")
 
 	for child in root:
 		if child.tag == 'message':
@@ -51,7 +53,11 @@ def main():
 	
 	print("Parsing done!")
 
-	generators.cpp.generate(iota_messages, root.attrib['module'])
+	if args.generator == 'cpp':
+		generators.cpp.generate(args.o, iota_messages, root.attrib['module'])
+	else:
+		print(f"Unknown generator: {args.generator}")
+		exit()
 
 
 
@@ -59,7 +65,7 @@ def parse_message(xml_message):
 	message_type = xml_message.get('type', 'binary') # Assume default binary representation by default
 	message = iota_message(xml_message.attrib['name'], message_type)
 
-	print(f"    Message name: {xml_message.attrib['name']}, type: {message_type}")
+	print(f"IDL Message, name: {xml_message.attrib['name']}, type: {message_type}")
 
 	i = 0
 	for child in xml_message:
@@ -68,7 +74,7 @@ def parse_message(xml_message):
 		field_name = child.text
 		field_type = child.attrib['type']
 
-		print(f"        Field: Type: {field_type}, Name: {field_name}, index: {i}")
+		print(f"    Field: Type: {field_type}, Name: {field_name}, index: {i}")
 		
 		message.fields.append(iota_field(field_name, field_type, i))
 		i += 1
