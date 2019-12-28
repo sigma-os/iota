@@ -68,6 +68,14 @@ def generate_parser(file, message):
 
 	file.write(f"    }};\n\n")
 
+def generate_c_struct(file, message):
+	file.write(f"    struct {message.name} {{\n")
+
+	for field in message.fields:
+		file.write(f"        {get_native_type(field.type_)} {field.name};\n")
+
+	file.write(f"    }};\n")
+
 def generate(messages, module):
 	file = open('out.hpp', 'w')
 
@@ -83,13 +91,17 @@ def generate(messages, module):
 
 	formatted_module_name = formatted_module_name[:-2]
 
-	backslash = "{"
 	file.write(f"namespace {formatted_module_name} {{\n")
 
 	for message in messages:
-		generate_builder(file, message)
-		generate_parser(file, message)
-		
+		if message.type_ == 'binary':
+			generate_builder(file, message)
+			generate_parser(file, message)
+		elif message.type_ == 'raw_struct':
+			generate_c_struct(file, message)
+		else:
+			print(f"cpp: Unknown generate type: {message.type_}")
+			exit()
 
 	file.write("}")
 
