@@ -1,6 +1,3 @@
-#pragma once
-
-#include <stdint.h>
 #include <frg/optional.hpp>
 #include <frg/vector.hpp>
 #include <frg/string.hpp>
@@ -39,5 +36,3 @@ namespace iota
         return string{IOTA_FRIGG_GET_ALLOCATOR()};
     }
 } // namespace iota
-
-#define IOTA_LIB_AVAILABLE

@@ -36,7 +36,7 @@ def generate_builder(file, message):
 	file.write(f"        }}\n")
 
 	file.write(f"    private:\n")
-	file.write(f"        iota::buffer_builder buf;\n")
+	file.write(f"        iota::buffer_generator buf;\n")
 
 	file.write(f"    }};\n\n")
 
@@ -96,6 +96,13 @@ def generate_raw_struct(file, message):
 
 	file.write(f"    }};\n")
 
+
+def copy_file_contents(file1, file2):
+	for line in file1:
+		file2.write(line)
+
+	file2.write("\n\n")
+
 def generate(subgenerator, output, messages, module):
 	file = open(output, 'w')
 	
@@ -103,14 +110,17 @@ def generate(subgenerator, output, messages, module):
 	file.write("#include <stdint.h>\n")
 
 	if subgenerator == 'std':
-		file.write("#include <iota/iota-std.hpp>\n")
+		lib_file = open('lib/cpp/lib-std.hpp', 'r')
+		copy_file_contents(lib_file, file)
 	elif subgenerator == 'frigg':
-		file.write("#include <iota/iota-frigg.hpp>\n")
+		lib_file = open('lib/cpp/lib-frigg.hpp', 'r')
+		copy_file_contents(lib_file, file)
 	else:	
 		print(f"cpp: Unknown subgenerator: {subgenerator}")
 		exit()
 
-	file.write("#include <iota/buffer_builder.hpp>\n\n")
+	buffer_builder_file = open('lib/cpp/buffer_builder.hpp', 'r')
+	copy_file_contents(buffer_builder_file, file)
 
 	formatted_module_name = module.replace('.', '::')
 
@@ -127,5 +137,7 @@ def generate(subgenerator, output, messages, module):
 			exit()
 
 	file.write("}")
+
+	file.close()
 
 	print("Generated C++ header")

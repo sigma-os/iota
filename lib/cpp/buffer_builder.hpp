@@ -1,9 +1,3 @@
-#pragma once
-
-#ifndef IOTA_LIB_AVAILABLE
-#error "IOTA_LIB_AVAILABLE isn't set"
-#endif
-
 namespace iota
 {
     class buffer_generator {
@@ -26,12 +20,6 @@ namespace iota
 
     template<typename T>
     void buffer_generator::add<T>(index_type i, T item){ }
-
-    /*
-int8 ::= index, byte
-int16 ::= index, word
-int32 ::= index, dword
-int64 ::= index, qword*/
 
     template<>
     void buffer_generator::add<uint8_t>(index_type i, uint8_t item){
@@ -72,5 +60,42 @@ int64 ::= index, qword*/
         vec.push_back((item >> 56) & 0xFF);
     }
 
+    template<>
+    void buffer_generator::add<int8_t>(index_type i, int8_t item){
+        // int8 ::= index, byte
+        vec.push_back(i);
+        vec.push_back(item);
+    }
 
+    template<>
+    void buffer_generator::add<int16_t>(index_type i, int16_t item){
+        // int16 ::= index, word
+        vec.push_back(i);
+        vec.push_back(item & 0xFF);
+        vec.push_back((item >> 8) & 0xFF);
+    }
+
+    template<>
+    void buffer_generator::add<int32_t>(index_type i, int32_t item){
+        // int32 ::= index, dword
+        vec.push_back(i);
+        vec.push_back(item & 0xFF);
+        vec.push_back((item >> 8) & 0xFF);
+        vec.push_back((item >> 16) & 0xFF);
+        vec.push_back((item >> 24) & 0xFF);
+    }
+
+    template<>
+    void buffer_generator::add<int64_t>(index_type i, int64_t item){
+        // int64 ::= index, qword
+        vec.push_back(i);
+        vec.push_back(item & 0xFF);
+        vec.push_back((item >> 8) & 0xFF);
+        vec.push_back((item >> 16) & 0xFF);
+        vec.push_back((item >> 24) & 0xFF);
+        vec.push_back((item >> 32) & 0xFF);
+        vec.push_back((item >> 40) & 0xFF);
+        vec.push_back((item >> 48) & 0xFF);
+        vec.push_back((item >> 56) & 0xFF);
+    }
 } // namespace iota

@@ -1,6 +1,3 @@
-#pragma once
-
-#include <stdint.h>
 #include <optional>
 #include <vector>
 #include <string>
@@ -31,5 +28,3 @@ namespace iota
         return {};
     }
 } // namespace iota
-
-#define IOTA_LIB_AVAILABLE
