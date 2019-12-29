@@ -102,13 +102,7 @@ def generate(output, messages, module):
 	file.write("#pragma once\n\n")
 	file.write("#include <stdint.h>\n\n")
 
-	module_parts = module.split('.')
-	formatted_module_name = ''
-	for part in module_parts:
-		formatted_module_name += part
-		formatted_module_name += '::'
-
-	formatted_module_name = formatted_module_name[:-2]
+	formatted_module_name = module.replace('.', '::')
 
 	file.write(f"namespace {formatted_module_name} {{\n")
 
