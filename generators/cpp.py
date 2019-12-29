@@ -8,7 +8,7 @@ def get_native_type(type):
 		'int16': 'int16_t',
 		'int32': 'int32_t',
 		'int64': 'int64_t',
-		'buffer': 'iota::buffer<uint8_t>',
+		'buffer': 'iota::vector<uint8_t>',
 		'string': 'iota::string'
 	}
 
@@ -96,11 +96,21 @@ def generate_raw_struct(file, message):
 
 	file.write(f"    }};\n")
 
-def generate(output, messages, module):
+def generate(subgenerator, output, messages, module):
 	file = open(output, 'w')
 	
 	file.write("#pragma once\n\n")
-	file.write("#include <stdint.h>\n\n")
+	file.write("#include <stdint.h>\n")
+
+	if subgenerator == 'std':
+		file.write("#include <iota/iota-std.hpp>\n")
+	elif subgenerator == 'frigg':
+		file.write("#include <iota/iota-frigg.hpp>\n")
+	else:	
+		print(f"cpp: Unknown subgenerator: {subgenerator}")
+		exit()
+
+	file.write("#include <iota/buffer_builder.hpp>\n\n")
 
 	formatted_module_name = module.replace('.', '::')
 

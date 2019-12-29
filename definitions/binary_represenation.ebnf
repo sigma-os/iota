@@ -3,19 +3,25 @@ word ::= 16 bit number
 dword ::= 32 bit number
 qword  ::= 64 bit number
 char ::= 8bit ASCII character (bit 7 is always clear)
+index ::= byte
 
-uint8 ::= byte
-uint16 ::= word
-uint32 ::= dword
-uint64 ::= qword
+uint8 ::= index, byte
+uint16 ::= index, word
+uint32 ::= index, dword
+uint64 ::= index, qword
 
-buffer ::= buffer_length, {byte}
+int8 ::= index, byte
+int16 ::= index, word
+int32 ::= index, dword
+int64 ::= index, qword
+
+buffer ::= index, buffer_length, {byte}
 buffer_length ::= qword
 
-string ::= string_length, {char}
+string ::= index, string_length, {char}
 string_length ::= qword
 
-entry ::= index, (uint8 | uint16 | uint32 | uint64 | buffer | string)
-index ::= byte
+entry ::= uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64 | buffer | string
+
 
 table ::= {entry}

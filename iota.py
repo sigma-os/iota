@@ -30,6 +30,7 @@ def main():
 	parser = argparse.ArgumentParser(description='Generate iota files')
 	parser.add_argument('input', help="Select file to generate")
 	parser.add_argument('-g', '--generator', help='Select code generator to use', required=True)
+	parser.add_argument('-s', '--subgenerator', help='Select sub code generator to use', required=True)
 	parser.add_argument('-o', metavar='OUTPUT', help='Select output file', required=True)
 	args = parser.parse_args()
 
@@ -54,7 +55,7 @@ def main():
 	print("Parsing done!")
 
 	if args.generator == 'cpp':
-		generators.cpp.generate(args.o, iota_messages, root.attrib['module'])
+		generators.cpp.generate(args.subgenerator, args.o, iota_messages, root.attrib['module'])
 	else:
 		print(f"Unknown generator: {args.generator}")
 		exit()
