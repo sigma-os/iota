@@ -98,4 +98,55 @@ namespace iota
         vec.push_back((item >> 48) & 0xFF);
         vec.push_back((item >> 56) & 0xFF);
     }
+
+    template<>
+    void buffer_generator::add<iota::string>(index_type i, iota::string item){
+        /*
+         * string ::= index, string_length, {char}
+         * string_length ::= qword
+         */
+        
+        vec.push_back(i); // index
+
+        // string_length
+        uint64_t length = item.length();
+        vec.push_back(length & 0xFF);
+        vec.push_back((length >> 8) & 0xFF);
+        vec.push_back((length >> 16) & 0xFF);
+        vec.push_back((length >> 24) & 0xFF);
+        vec.push_back((length >> 32) & 0xFF);
+        vec.push_back((length >> 40) & 0xFF);
+        vec.push_back((length >> 48) & 0xFF);
+        vec.push_back((length >> 56) & 0xFF);
+
+        // {char}
+        for(size_t i = 0; i < length; i++)
+            vec.push_back(item.data()[i]);
+    }
+
+    template<>
+    void buffer_generator::add<iota::vector<uint8_t>>(index_type i, iota::vector<uint8_t> item){
+        /*
+         * buffer ::= index, buffer_length, {byte}
+         * buffer_length ::= qword
+         */
+        
+        vec.push_back(i); // index
+
+        // buffer_length
+        uint64_t length = item.size();
+        vec.push_back(length & 0xFF);
+        vec.push_back((length >> 8) & 0xFF);
+        vec.push_back((length >> 16) & 0xFF);
+        vec.push_back((length >> 24) & 0xFF);
+        vec.push_back((length >> 32) & 0xFF);
+        vec.push_back((length >> 40) & 0xFF);
+        vec.push_back((length >> 48) & 0xFF);
+        vec.push_back((length >> 56) & 0xFF);
+
+        // {byte}
+        for(size_t i = 0; i < length; i++)
+            vec.push_back(item.data()[i]);
+    }
+         
 } // namespace iota
