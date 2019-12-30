@@ -74,33 +74,6 @@ def generate_parser(file, message):
 
 	file.write(f"    }};\n\n")
 
-def get_raw_struct_native_type(type):
-	dictionary = {
-		'uint8': 'uint8_t',
-		'uint16': 'uint16_t',
-		'uint32': 'uint32_t',
-		'uint64': 'uint64_t',
-		'int8': 'int8_t',
-		'int16': 'int16_t',
-		'int32': 'int32_t',
-		'int64': 'int64_t',
-	}
-
-	return dictionary.get(type, 'None')
-
-def generate_raw_struct(file, message):
-	file.write(f"    struct {message.name} {{\n")
-
-	for field in message.fields:
-		type = get_raw_struct_native_type(field.type_)
-		if type == 'None':
-			print(f"Unsupported type in raw_struct, type: {field.type_}")
-			exit()
-		file.write(f"        {get_raw_struct_native_type(field.type_)} {field.name};\n")
-
-	file.write(f"    }};\n")
-
-
 def copy_file_contents(file1, file2):
 	for line in file1:
 		file2.write(line)
@@ -117,9 +90,11 @@ def generate(subgenerator, output, messages, module):
 	if subgenerator == 'std':
 		lib_file = open('lib/cpp/lib-std.hpp', 'r')
 		copy_file_contents(lib_file, file)
+		lib_file.close()
 	elif subgenerator == 'frigg':
 		lib_file = open('lib/cpp/lib-frigg.hpp', 'r')
 		copy_file_contents(lib_file, file)
+		lib_file.close()
 	else:	
 		print(f"cpp: Unknown subgenerator: {subgenerator}")
 		exit()
@@ -132,14 +107,8 @@ def generate(subgenerator, output, messages, module):
 	file.write(f"namespace {formatted_module_name} {{\n")
 
 	for message in messages:
-		if message.type_ == 'binary':
-			generate_builder(file, message)
-			generate_parser(file, message)
-		elif message.type_ == 'raw_struct':
-			generate_raw_struct(file, message)
-		else:
-			print(f"cpp: Unknown generate type: {message.type_}")
-			exit()
+		generate_builder(file, message)
+		generate_parser(file, message)
 
 	file.write("}")
 

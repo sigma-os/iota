@@ -1,5 +1,0 @@
-<iota version="0.0.1" module="basic">
-    <message name="message" type="raw_struct">
-        <field type="uint64">my_number</field>
-    </message>
-</iota>

@@ -2,22 +2,21 @@ namespace iota
 {
     class buffer_generator {
     public:
+        template<typename T>
+        void add(index_type i, T item);
 
-    template<typename T>
-    void add(index_type i, T item);
+        void serialize(){
+            // Just do NOP but let other APIs do the memory allocation here if they wish
+            return;
+        }
 
-    void serialize(){
-        // Just do NOP but let other APIs do the memory allocation here if they wish
-        return;
-    }
+        uint8_t* data(){
+            return vec.data();
+        }
 
-    uint8_t* data(){
-        return vec.data();
-    }
-
-    size_t length(){
-        return vec.size();
-    }
+        size_t length(){
+            return vec.size();
+        }
 
     private:
         iota::vector<uint8_t> vec;

@@ -18,11 +18,7 @@ An example is
 `<iota version="0.0.1" module="foo.bar">`
 
 ### <message>
-Under the root node various `<message>` nodes exist which describe a message, it has 2 attributes `name` which tells us the name of the module and the optional `type` which has 2 possible values:
-
-- `binary`: Which uses the binary representation and support dynamic types (e.g. buffer)
-- `raw_struct`: Generates a raw struct, only supports number types
-If none is supplied `binary` is assumed
+Under the root node various `<message>` nodes exist which describe a message, it has 2 attributes `name` which tells us the name of the module
 
 An example node would be
 
@@ -60,12 +56,7 @@ In this way we can create an example IDL file
         <field type="uint32">abc</field>
         <field type="buffer">buf</field>
     </message>
-
-    <message name="bar" type="raw_struct">
-        <field type="uint64">test</field>
-        <field type="uint32">abc</field>
-    </message>
 </iota>
 ```
 
-for other example look in the `examples/` directory
+for other examples look in the `examples/` directory

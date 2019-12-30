@@ -17,13 +17,11 @@ class iota_field:
 	index = 0
 
 class iota_message:
-	def __init__(self, name, type_):
+	def __init__(self, name):
 		self.name = name
-		self.type_ = type_;
 		self.fields = []
 
 	name = ''
-	type_ = ''
 	fields = []
 
 def main():
@@ -63,10 +61,9 @@ def main():
 
 
 def parse_message(xml_message):
-	message_type = xml_message.get('type', 'binary') # Assume default binary representation by default
-	message = iota_message(xml_message.attrib['name'], message_type)
+	message = iota_message(xml_message.attrib['name'])
 
-	print(f"IDL Message, name: {xml_message.attrib['name']}, type: {message_type}")
+	print(f"IDL Message: {xml_message.attrib['name']}")
 
 	i = 0
 	for child in xml_message:
