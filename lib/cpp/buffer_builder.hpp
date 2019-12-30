@@ -14,12 +14,15 @@ namespace iota
     uint8_t* data(){
         return vec.data();
     }
+
+    size_t length(){
+        return vec.size();
+    }
+
     private:
         iota::vector<uint8_t> vec;
     };
 
-    template<typename T>
-    void buffer_generator::add<T>(index_type i, T item){ }
 
     template<>
     void buffer_generator::add<uint8_t>(index_type i, uint8_t item){

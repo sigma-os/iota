@@ -35,6 +35,10 @@ def generate_builder(file, message):
 	file.write(f"            return buf.data();\n")
 	file.write(f"        }}\n")
 
+	file.write(f"        size_t length() {{\n")
+	file.write(f"            return buf.length();\n")
+	file.write(f"        }}\n")
+
 	file.write(f"    private:\n")
 	file.write(f"        iota::buffer_generator buf;\n")
 
@@ -108,6 +112,7 @@ def generate(subgenerator, output, messages, module):
 	
 	file.write("#pragma once\n\n")
 	file.write("#include <stdint.h>\n")
+	file.write("#include <stddef.h>\n")
 
 	if subgenerator == 'std':
 		lib_file = open('lib/cpp/lib-std.hpp', 'r')
