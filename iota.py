@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import xml.etree.ElementTree as ElementTree
 import generators.cpp
 import sys
