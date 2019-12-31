@@ -4,25 +4,38 @@ import sys
 import argparse
 
 iota_version = '0.0.1'
-iota_messages = []
+iota_nodes = []
 
-class iota_field:
-	def __init__(self, name, type_, index):
+class iota_message_field:
+	def __init__(self, name, type, index):
 		self.name = name
-		self.type_ = type_
+		self.type = type
 		self.index = index
 	
 	name = ''
-	type_ = ''
+	type = ''
 	index = 0
 
-class iota_message:
-	def __init__(self, name):
+class iota_enum_entry:
+	def __init__(self, name, value, index):
 		self.name = name
-		self.fields = []
+		self.value = value
+		self.index = index
 
 	name = ''
-	fields = []
+	value = 0
+	index = 0
+
+class iota_node:
+	def __init__(self, name, type):
+		self.name = name
+		self.items = []
+		self.type = type
+
+	name = ''
+	type = ''
+	item_type = ''
+	items = []
 
 def main():
 	parser = argparse.ArgumentParser(description='Generate iota files')
@@ -46,6 +59,8 @@ def main():
 	for child in root:
 		if child.tag == 'message':
 			parse_message(child)
+		elif child.tag == 'enum':
+			parse_enum(child)
 		else:
 			print(f"Unknown tag {child.tag}, ignoring...")
 
@@ -53,15 +68,33 @@ def main():
 	print("Parsing done!")
 
 	if args.generator == 'cpp':
-		generators.cpp.generate(args.subgenerator, args.o, iota_messages, root.attrib['module'])
+		generators.cpp.generate(args.subgenerator, args.o, iota_nodes, root.attrib['module'])
 	else:
 		print(f"Unknown generator: {args.generator}")
 		exit()
 
+def parse_enum(xml_enum):
+	enum = iota_node(xml_enum.attrib['name'], 'enum')
+	enum.item_type = xml_enum.attrib['type']
 
+	print(f"IDL Enum: {xml_enum.attrib['name']}, type: {enum.item_type}")
+
+	i = 0
+	for child in xml_enum:
+		assert child.tag == 'entry'
+
+		entry_name = child.text
+		entry_value = child.attrib['value']
+
+		print(f"    Entry: name: {entry_name}, value: {entry_value}")
+
+		enum.items.append(iota_enum_entry(entry_name, entry_value, i))
+		i += 1
+
+	iota_nodes.append(enum)
 
 def parse_message(xml_message):
-	message = iota_message(xml_message.attrib['name'])
+	message = iota_node(xml_message.attrib['name'], 'message')
 
 	print(f"IDL Message: {xml_message.attrib['name']}")
 
@@ -74,10 +107,10 @@ def parse_message(xml_message):
 
 		print(f"    Field: Type: {field_type}, Name: {field_name}, index: {i}")
 		
-		message.fields.append(iota_field(field_name, field_type, i))
+		message.items.append(iota_message_field(field_name, field_type, i))
 		i += 1
 
-	iota_messages.append(message)
+	iota_nodes.append(message)
 
 
 main()
