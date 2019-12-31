@@ -1,0 +1,7 @@
+<iota version="0.0.1" module="basic">
+    <enum name="request" type="uint8">
+        <entry value="0">nop</entry>
+        <entry value="1">open</entry>
+        <entry value="2">close</entry>
+    </enum>
+</iota>
