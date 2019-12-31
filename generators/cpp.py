@@ -163,6 +163,9 @@ def generate(subgenerator, output, items, module):
 	file.write("#include <stdint.h>\n")
 	file.write("#include <stddef.h>\n")
 
+	if not subgenerator:
+		subgenerator = 'std' # use std as default subgen
+
 	if subgenerator == 'std':
 		lib_file = open('lib/cpp/lib-std.hpp', 'r')
 		copy_file_contents(lib_file, file)

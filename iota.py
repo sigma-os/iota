@@ -41,7 +41,7 @@ def main():
 	parser = argparse.ArgumentParser(description='Generate iota files')
 	parser.add_argument('input', help="Select file to generate")
 	parser.add_argument('-g', '--generator', help='Select code generator to use', required=True)
-	parser.add_argument('-s', '--subgenerator', help='Select sub code generator to use', required=True)
+	parser.add_argument('-s', '--subgenerator', help='Select sub code generator to use')
 	parser.add_argument('-o', metavar='OUTPUT', help='Select output file', required=True)
 	args = parser.parse_args()
 
