@@ -45,24 +45,76 @@ def generate_builder(file, message):
 	file.write(f"    }};\n\n")
 
 def generate_parser(file, message):
+	field_internal_names = []
+	for field in message.fields:
+		field_internal_names.append(f"_{field.name}")
+
 	class_name = f"{message.name}_parser"
 	file.write(f"    class {class_name} {{\n")
 	file.write(f"    public:\n")
 
-	file.write(f"        {class_name}(uint8_t* buf) {{\n")
-	file.write(f"            // TODO\n")
+	file.write(f"        {class_name}(uint8_t* buf, size_t size) {{\n")
+	file.write(f"            for(size_t i = 0; i < size; i++){{\n")
+	file.write(f"                switch(buf[i]){{\n")
+
+	for field in message.fields:
+		file.write(f"                // {field.type_}\n")
+		file.write(f"                case {field.index}: {{\n")
+		if field.type_ == 'uint8':
+			file.write(f"                    this->{field_internal_names[field.index]} = buf[i + 1];\n")
+			file.write(f"                    i++; // 1 byte size beyond the index\n")
+		elif field.type_ == 'uint16':
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_native_type(field.type_)})(buf[i + 1] | (({get_native_type(field.type_)})buf[i + 2] << 8));\n")
+			file.write(f"                    i += 2;\n")
+		elif field.type_ == 'uint32':
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_native_type(field.type_)})(buf[i + 1] | (({get_native_type(field.type_)})buf[i + 2] << 8) | (({get_native_type(field.type_)})buf[i + 3] << 16) | (({get_native_type(field.type_)})buf[i + 4] << 24));\n")
+			file.write(f"                    i += 4;\n")
+		elif field.type_ == 'uint64':
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_native_type(field.type_)})(buf[i + 1] | (({get_native_type(field.type_)})buf[i + 2] << 8) | (({get_native_type(field.type_)})buf[i + 3] << 16) | (({get_native_type(field.type_)})buf[i + 4] << 24) | (({get_native_type(field.type_)})buf[i + 5] << 32) | (({get_native_type(field.type_)})buf[i + 6] << 40) | (({get_native_type(field.type_)})buf[i + 7] << 48) | (({get_native_type(field.type_)})buf[i + 8] << 56));\n")
+			file.write(f"                    i += 8;\n")
+		elif field.type_ == 'int8':
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_native_type(field.type_)})buf[i + 1];\n")
+			file.write(f"                    i++; // 1 byte size beyond the index\n")
+		elif field.type_ == 'int16':
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_native_type(field.type_)})(buf[i + 1] | (({get_native_type(field.type_)})buf[i + 2] << 8));\n")
+			file.write(f"                    i += 2;\n")
+		elif field.type_ == 'int32':
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_native_type(field.type_)})(buf[i + 1] | (({get_native_type(field.type_)})buf[i + 2] << 8) | (({get_native_type(field.type_)})buf[i + 3] << 16) | (({get_native_type(field.type_)})buf[i + 4] << 24));\n")
+			file.write(f"                    i += 4;\n")
+		elif field.type_ == 'int64':
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_native_type(field.type_)})(buf[i + 1] | (({get_native_type(field.type_)})buf[i + 2] << 8) | (({get_native_type(field.type_)})buf[i + 3] << 16) | (({get_native_type(field.type_)})buf[i + 4] << 24) | (({get_native_type(field.type_)})buf[i + 5] << 32) | (({get_native_type(field.type_)})buf[i + 6] << 40) | (({get_native_type(field.type_)})buf[i + 7] << 48) | (({get_native_type(field.type_)})buf[i + 8] << 56));\n")
+			file.write(f"                    i += 8;\n")
+		elif field.type_ == 'string':
+			file.write(f"                    size_t size = (size_t)(buf[i + 1] | ((size_t)buf[i + 2] << 8) | ((size_t)buf[i + 3] << 16) | ((size_t)buf[i + 4] << 24) | ((size_t)buf[i + 5] << 32) | ((size_t)buf[i + 6] << 40) | ((size_t)buf[i + 7] << 48) | ((size_t)buf[i + 8] << 56));\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = {get_native_type(field.type_)}{{}};\n")
+			file.write(f"                    for(size_t j = 9/*start index after size*/; j < (size + 9); j++)\n")
+			file.write(f"                        this->{field_internal_names[field.index]}->push_back(buf[j]);\n")
+			file.write(f"                    i += (8 + size);\n")
+		elif field.type_ == 'buffer':
+			file.write(f"                    size_t size = (size_t)(buf[i + 1] | ((size_t)buf[i + 2] << 8) | ((size_t)buf[i + 3] << 16) | ((size_t)buf[i + 4] << 24) | ((size_t)buf[i + 5] << 32) | ((size_t)buf[i + 6] << 40) | ((size_t)buf[i + 7] << 48) | ((size_t)buf[i + 8] << 56));\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = {get_native_type(field.type_)}{{}};\n")
+			file.write(f"                    for(size_t j = 9/*start index after size*/; j < (size + 9); j++)\n")
+			file.write(f"                        this->{field_internal_names[field.index]}->push_back(buf[j]);\n")
+			file.write(f"                    i += (8 + size);\n")
+		
+		file.write(f"                    break;\n")
+		file.write(f"                }}\n")
+
+
+	file.write(f"                }}\n")
+	file.write(f"            }}\n")
 	file.write(f"        }}\n")
 
 	for field in message.fields:
 		name = field.name
 		native_type = get_native_type(field.type_)
-		
+
 		file.write(f"        const {native_type}& get_{name}() {{\n")
-		file.write(f"            return *this->_{name};\n")
+		file.write(f"            return *this->{field_internal_names[field.index]};\n")
 		file.write(f"        }}\n")
 
 		file.write(f"        bool has_{name}() {{\n")
-		file.write(f"            return this->_{name}.has_value();\n")
+		file.write(f"            return this->{field_internal_names[field.index]}.has_value();\n")
 		file.write(f"        }}\n")
 
 	file.write(f"    private:\n")

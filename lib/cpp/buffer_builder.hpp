@@ -66,39 +66,47 @@ namespace iota
     void buffer_generator::add<int8_t>(index_type i, int8_t item){
         // int8 ::= index, byte
         vec.push_back(i);
-        vec.push_back(item);
+
+        uint8_t raw = (uint8_t)item;
+        vec.push_back(raw);
     }
 
     template<>
     void buffer_generator::add<int16_t>(index_type i, int16_t item){
         // int16 ::= index, word
         vec.push_back(i);
-        vec.push_back(item & 0xFF);
-        vec.push_back((item >> 8) & 0xFF);
+
+        uint16_t raw = (uint16_t)item;
+        vec.push_back(raw & 0xFF);
+        vec.push_back((raw >> 8) & 0xFF);
     }
 
     template<>
     void buffer_generator::add<int32_t>(index_type i, int32_t item){
         // int32 ::= index, dword
         vec.push_back(i);
-        vec.push_back(item & 0xFF);
-        vec.push_back((item >> 8) & 0xFF);
-        vec.push_back((item >> 16) & 0xFF);
-        vec.push_back((item >> 24) & 0xFF);
+
+        uint32_t raw = (uint32_t)item;
+        vec.push_back(raw & 0xFF);
+        vec.push_back((raw >> 8) & 0xFF);
+        vec.push_back((raw >> 16) & 0xFF);
+        vec.push_back((raw >> 24) & 0xFF);
     }
 
     template<>
     void buffer_generator::add<int64_t>(index_type i, int64_t item){
         // int64 ::= index, qword
         vec.push_back(i);
-        vec.push_back(item & 0xFF);
-        vec.push_back((item >> 8) & 0xFF);
-        vec.push_back((item >> 16) & 0xFF);
-        vec.push_back((item >> 24) & 0xFF);
-        vec.push_back((item >> 32) & 0xFF);
-        vec.push_back((item >> 40) & 0xFF);
-        vec.push_back((item >> 48) & 0xFF);
-        vec.push_back((item >> 56) & 0xFF);
+
+        uint64_t raw = (uint64_t)item;
+        vec.push_back(raw & 0xFF);
+        vec.push_back((raw >> 8) & 0xFF);
+        vec.push_back((raw >> 16) & 0xFF);
+        vec.push_back((raw >> 24) & 0xFF);
+        vec.push_back((raw >> 32) & 0xFF);
+        vec.push_back((raw >> 40) & 0xFF);
+        vec.push_back((raw >> 48) & 0xFF);
+        vec.push_back((raw >> 56) & 0xFF);
     }
 
     template<>
