@@ -2,6 +2,8 @@ namespace iota
 {
     class buffer_generator {
     public:
+        buffer_generator(): vec(iota::create_vector<uint8_t>()) {}
+
         template<typename T>
         void add(index_type i, T item);
 
@@ -119,7 +121,7 @@ namespace iota
         vec.push_back(i); // index
 
         // string_length
-        uint64_t length = item.length();
+        uint64_t length = item.size();
         vec.push_back(length & 0xFF);
         vec.push_back((length >> 8) & 0xFF);
         vec.push_back((length >> 16) & 0xFF);
