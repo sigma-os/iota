@@ -54,49 +54,52 @@ def generate_parser(file, message):
 	file.write(f"    public:\n")
 
 	file.write(f"        {class_name}(uint8_t* buf, size_t size) {{\n")
-	file.write(f"            for(size_t i = 0; i < size; i++){{\n")
-	file.write(f"                switch(buf[i]){{\n")
+	file.write(f"            for(size_t i = 0; i < size;){{\n")
+	file.write(f"                i++;\n")
+	file.write(f"                switch(buf[i - 1]){{\n")
 
 	for field in message.items:
 		file.write(f"                // {field.type}\n")
 		file.write(f"                case {field.index}: {{\n")
 		if field.type == 'uint8':
-			file.write(f"                    this->{field_internal_names[field.index]} = buf[i + 1];\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = buf[i];\n")
 			file.write(f"                    i++; // 1 byte size beyond the index\n")
 		elif field.type == 'uint16':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i + 1] | (({get_message_native_type(field.type)})buf[i + 2] << 8));\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8));\n")
 			file.write(f"                    i += 2;\n")
 		elif field.type == 'uint32':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i + 1] | (({get_message_native_type(field.type)})buf[i + 2] << 8) | (({get_message_native_type(field.type)})buf[i + 3] << 16) | (({get_message_native_type(field.type)})buf[i + 4] << 24));\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8) | (({get_message_native_type(field.type)})buf[i + 2] << 16) | (({get_message_native_type(field.type)})buf[i + 3] << 24));\n")
 			file.write(f"                    i += 4;\n")
 		elif field.type == 'uint64':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i + 1] | (({get_message_native_type(field.type)})buf[i + 2] << 8) | (({get_message_native_type(field.type)})buf[i + 3] << 16) | (({get_message_native_type(field.type)})buf[i + 4] << 24) | (({get_message_native_type(field.type)})buf[i + 5] << 32) | (({get_message_native_type(field.type)})buf[i + 6] << 40) | (({get_message_native_type(field.type)})buf[i + 7] << 48) | (({get_message_native_type(field.type)})buf[i + 8] << 56));\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8) | (({get_message_native_type(field.type)})buf[i + 2] << 16) | (({get_message_native_type(field.type)})buf[i + 3] << 24) | (({get_message_native_type(field.type)})buf[i + 4] << 32) | (({get_message_native_type(field.type)})buf[i + 5] << 40) | (({get_message_native_type(field.type)})buf[i + 6] << 48) | (({get_message_native_type(field.type)})buf[i + 7] << 56));\n")
 			file.write(f"                    i += 8;\n")
 		elif field.type == 'int8':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})buf[i + 1];\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})buf[i];\n")
 			file.write(f"                    i++; // 1 byte size beyond the index\n")
 		elif field.type == 'int16':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i + 1] | (({get_message_native_type(field.type)})buf[i + 2] << 8));\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8));\n")
 			file.write(f"                    i += 2;\n")
 		elif field.type == 'int32':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i + 1] | (({get_message_native_type(field.type)})buf[i + 2] << 8) | (({get_message_native_type(field.type)})buf[i + 3] << 16) | (({get_message_native_type(field.type)})buf[i + 4] << 24));\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8) | (({get_message_native_type(field.type)})buf[i + 2] << 16) | (({get_message_native_type(field.type)})buf[i + 3] << 24));\n")
 			file.write(f"                    i += 4;\n")
 		elif field.type == 'int64':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i + 1] | (({get_message_native_type(field.type)})buf[i + 2] << 8) | (({get_message_native_type(field.type)})buf[i + 3] << 16) | (({get_message_native_type(field.type)})buf[i + 4] << 24) | (({get_message_native_type(field.type)})buf[i + 5] << 32) | (({get_message_native_type(field.type)})buf[i + 6] << 40) | (({get_message_native_type(field.type)})buf[i + 7] << 48) | (({get_message_native_type(field.type)})buf[i + 8] << 56));\n")
+			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8) | (({get_message_native_type(field.type)})buf[i + 2] << 16) | (({get_message_native_type(field.type)})buf[i + 3] << 24) | (({get_message_native_type(field.type)})buf[i + 4] << 32) | (({get_message_native_type(field.type)})buf[i + 5] << 40) | (({get_message_native_type(field.type)})buf[i + 6] << 48) | (({get_message_native_type(field.type)})buf[i + 7] << 56));\n")
 			file.write(f"                    i += 8;\n")
 		elif field.type == 'string':
+			file.write(f"                    size_t size = (size_t)(buf[i] | ((size_t)buf[i + 1] << 8) | ((size_t)buf[i + 2] << 16) | ((size_t)buf[i + 3] << 24) | ((size_t)buf[i + 4] << 32) | ((size_t)buf[i + 5] << 40) | ((size_t)buf[i + 6] << 48) | ((size_t)buf[i + 7] << 56));\n")
+			file.write(f"                    i += 8;\n")
 			file.write(f"                    this->{field_internal_names[field.index]} = iota::create_string();\n")
-			file.write(f"                    size_t size = (size_t)(buf[i + 1] | ((size_t)buf[i + 2] << 8) | ((size_t)buf[i + 3] << 16) | ((size_t)buf[i + 4] << 24) | ((size_t)buf[i + 5] << 32) | ((size_t)buf[i + 6] << 40) | ((size_t)buf[i + 7] << 48) | ((size_t)buf[i + 8] << 56));\n")
 			file.write(f"                    this->{field_internal_names[field.index]}->resize(size);\n")
-			file.write(f"                    for(size_t j = 9/*start index after size*/; j < (size + 9); j++)\n")
-			file.write(f"                        this->{field_internal_names[field.index]}->operator[](j - 9) = buf[i + j];\n")
-			file.write(f"                    i += (8 + size);\n")
+			file.write(f"                    for(size_t j = 0; j < size; j++)\n")
+			file.write(f"                        this->{field_internal_names[field.index]}->operator[](j) = buf[i + j];\n")
+			file.write(f"                    i += size;\n")
 		elif field.type == 'buffer':
+			file.write(f"                    size_t size = (size_t)(buf[i] | ((size_t)buf[i + 1] << 8) | ((size_t)buf[i + 2] << 16) | ((size_t)buf[i + 3] << 24) | ((size_t)buf[i + 4] << 32) | ((size_t)buf[i + 5] << 40) | ((size_t)buf[i + 6] << 48) | ((size_t)buf[i + 7] << 56));\n")
+			file.write(f"                    i += 8;\n")
 			file.write(f"                    this->{field_internal_names[field.index]} = iota::create_vector<uint8_t>();\n")
-			file.write(f"                    size_t size = (size_t)(buf[i + 1] | ((size_t)buf[i + 2] << 8) | ((size_t)buf[i + 3] << 16) | ((size_t)buf[i + 4] << 24) | ((size_t)buf[i + 5] << 32) | ((size_t)buf[i + 6] << 40) | ((size_t)buf[i + 7] << 48) | ((size_t)buf[i + 8] << 56));\n")
-			file.write(f"                    for(size_t j = 9/*start index after size*/; j < (size + 9); j++)\n")
+			file.write(f"                    for(size_t j = 0; j < size; j++)\n")
 			file.write(f"                        this->{field_internal_names[field.index]}->push_back(buf[i + j]);\n")
-			file.write(f"                    i += (8 + size);\n")
+			file.write(f"                    i += size;\n")
 		
 		file.write(f"                    break;\n")
 		file.write(f"                }}\n")
