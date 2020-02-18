@@ -160,5 +160,39 @@ namespace iota
         for(size_t i = 0; i < length; i++)
             vec.push_back(item.data()[i]);
     }
+
+    template<>
+    void buffer_generator::add<iota::vector<uint64_t>>(index_type i, iota::vector<uint64_t> item){
+        /*
+         * list ::= index, list_length, {qword}
+         * list_length ::= qword
+         */
+        
+        vec.push_back(i); // index
+
+        // list_length
+        uint64_t length = item.size();
+        vec.push_back(length & 0xFF);
+        vec.push_back((length >> 8) & 0xFF);
+        vec.push_back((length >> 16) & 0xFF);
+        vec.push_back((length >> 24) & 0xFF);
+        vec.push_back((length >> 32) & 0xFF);
+        vec.push_back((length >> 40) & 0xFF);
+        vec.push_back((length >> 48) & 0xFF);
+        vec.push_back((length >> 56) & 0xFF);
+
+        // {qword}
+        for(size_t i = 0; i < length; i++){
+            auto entry = item.data()[i];
+            vec.push_back(entry & 0xFF);
+            vec.push_back((entry >> 8) & 0xFF);
+            vec.push_back((entry >> 16) & 0xFF);
+            vec.push_back((entry >> 24) & 0xFF);
+            vec.push_back((entry >> 32) & 0xFF);
+            vec.push_back((entry >> 40) & 0xFF);
+            vec.push_back((entry >> 48) & 0xFF);
+            vec.push_back((entry >> 56) & 0xFF);
+        }
+    }
          
 } // namespace iota

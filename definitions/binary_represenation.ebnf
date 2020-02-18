@@ -18,10 +18,13 @@ int64 ::= index, qword
 buffer ::= index, buffer_length, {byte}
 buffer_length ::= qword
 
+list ::= index, list_length, {qword}
+list_length ::= qword
+
 string ::= index, string_length, {char}
 string_length ::= qword
 
-entry ::= uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64 | buffer | string
+entry ::= uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64 | buffer | list | string
 
 
 table ::= {entry}

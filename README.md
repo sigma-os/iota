@@ -39,8 +39,9 @@ following possible values:
 - `uint32`
 - `int64`
 - `uint64`
-- `buffer`
-- `string`
+- `buffer`: Array of uint8's
+- `string`: Array of ASCII characters
+- `list`: Array of uint64's
 
 And in between the `<field>` and `</field>` nodes the name is placed
 

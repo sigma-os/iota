@@ -75,13 +75,21 @@ namespace iota
     size_t parse_item<iota::vector<uint8_t>>(uint8_t* data, iota::vector<uint8_t>& value){
         using T = uint64_t;
         size_t size = (T)data[0] | ((T)data[1] << 8) | ((T)data[2] << 16) | ((T)data[3] << 24) | ((T)data[4] << 32) | ((T)data[5] << 40) | ((T)data[6] << 48) | ((T)data[7] << 56);
-        value.resize(size);
+        value.resize(size * sizeof(uint8_t));
         for(size_t i = 0; i < size; i++)
             value[i] = data[8 + i];
 
-        return 8 + size;
+        return 8 + (size * sizeof(uint8_t));
     }
 
+    template<>
+    size_t parse_item<iota::vector<uint64_t>>(uint8_t* data, iota::vector<uint64_t>& value){
+        using T = uint64_t;
+        size_t size = (T)data[0] | ((T)data[1] << 8) | ((T)data[2] << 16) | ((T)data[3] << 24) | ((T)data[4] << 32) | ((T)data[5] << 40) | ((T)data[6] << 48) | ((T)data[7] << 56);
+        value.resize(size);
+        for(size_t i = 0; i < size; i++)
+            value[i] = (T)data[8 + (i * 8)] | ((T)data[8 + (i * 8) + 1] << 8) | ((T)data[8 + (i * 8) + 2] << 16) | ((T)data[8 + (i * 8) + 3] << 24) | ((T)data[8 + (i * 8) + 4] << 32) | ((T)data[8 + (i * 8) + 5] << 40) | ((T)data[8 + (i * 8) + 6] << 48) | ((T)data[8 + (i * 8) + 7] << 56);;
 
-
+        return 8 + (size * sizeof(uint64_t));
+    }
 } // namespace iota

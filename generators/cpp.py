@@ -9,6 +9,7 @@ def get_message_native_type(type):
 		'int32': 'int32_t',
 		'int64': 'int64_t',
 		'buffer': 'iota::vector<uint8_t>',
+		'list': 'iota::vector<uint64_t>',
 		'string': 'iota::string'
 	}
 
@@ -25,6 +26,7 @@ def get_message_default_initializer(type):
 		'int32': '{}',
 		'int64': '{}',
 		'buffer': 'iota::create_vector<uint8_t>()',
+		'list': 'iota::create_vector<uint64_t>()',
 		'string': 'iota::create_string()'
 	}
 
@@ -74,7 +76,7 @@ def generate_parser(file, message):
 	for field in message.items:
 		file.write(f"\t\t\t\t// {field.type}\n")
 		file.write(f"\t\t\t\tcase {field.index}: {{\n")
-		file.write(f"\t\t\t\t\tthis->_p_{field.name} = true;\n")# {field_internal_names[field.index]} = {get_message_default_initializer(field.type)};\n")
+		file.write(f"\t\t\t\t\tthis->_p_{field.name} = true;\n")
 		file.write(f"\t\t\t\t\ti += iota::parse_item<{get_message_native_type(field.type)}>(&buf[i], this->_m_{field.name});\n")
 		file.write(f"\t\t\t\t\tbreak;\n")
 		file.write(f"\t\t\t\t}}\n")
@@ -114,9 +116,7 @@ def get_enum_native_type(type):
 		'int8': 'int8_t',
 		'int16': 'int16_t',
 		'int32': 'int32_t',
-		'int64': 'int64_t',
-		'buffer': 'iota::vector<uint8_t>',
-		'string': 'iota::string'
+		'int64': 'int64_t'
 	}
 
 	return dictionary.get(type)
