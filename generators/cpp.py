@@ -14,121 +14,96 @@ def get_message_native_type(type):
 
 	return dictionary.get(type)
 
+def get_message_default_initializer(type):
+	dictionary = {
+		'uint8': '{}',
+		'uint16': '{}',
+		'uint32': '{}',
+		'uint64': '{}',
+		'int8': '{}',
+		'int16': '{}',
+		'int32': '{}',
+		'int64': '{}',
+		'buffer': 'iota::create_vector<uint8_t>()',
+		'string': 'iota::create_string()'
+	}
+
+	return dictionary.get(type)
+
 def generate_builder(file, message):
 	class_name = f"{message.name}_builder"
-	file.write(f"    class {class_name} {{\n")
-	file.write(f"    public:\n")
+	file.write(f"\tclass {class_name} {{\n")
+	file.write(f"\tpublic:\n")
 
-	file.write(f"        {class_name}() {{}}\n")
+	file.write(f"\t{class_name}() {{}}\n")
 
 	for field in message.items:
 		name = field.name
 		native_type = get_message_native_type(field.type)
 		index = field.index
 
-		file.write(f"        void add_{name}({native_type} {name}) {{\n")
-		file.write(f"            buf.add<{native_type}>({index}, {name});\n")
-		file.write(f"        }}\n")
+		file.write(f"\t\tvoid add_{name}({native_type} {name}) {{\n")
+		file.write(f"\t\t\tbuf.add<{native_type}>({index}, {name});\n")
+		file.write(f"\t\t}}\n")
 
-	file.write(f"        uint8_t* serialize() {{\n")
-	file.write(f"            buf.serialize();\n")
-	file.write(f"            return buf.data();\n")
-	file.write(f"        }}\n")
+	file.write(f"\t\tuint8_t* serialize() {{\n")
+	file.write(f"\t\t\tbuf.serialize();\n")
+	file.write(f"\t\t\treturn buf.data();\n")
+	file.write(f"\t\t}}\n")
 
-	file.write(f"        size_t length() {{\n")
-	file.write(f"            return buf.length();\n")
-	file.write(f"        }}\n")
+	file.write(f"\t\tsize_t length() {{\n")
+	file.write(f"\t\t\treturn buf.length();\n")
+	file.write(f"\t\t}}\n")
 
-	file.write(f"    private:\n")
-	file.write(f"        iota::buffer_generator buf;\n")
+	file.write(f"\tprivate:\n")
+	file.write(f"\t\tiota::buffer_generator buf;\n")
 
-	file.write(f"    }};\n\n")
+	file.write(f"\t}};\n\n")
 
 def generate_parser(file, message):
-	field_internal_names = []
-	for field in message.items:
-		field_internal_names.append(f"_{field.name}")
-
 	class_name = f"{message.name}_parser"
-	file.write(f"    class {class_name} {{\n")
-	file.write(f"    public:\n")
+	file.write(f"\tclass {class_name} {{\n")
+	file.write(f"\tpublic:\n")
 
-	file.write(f"        {class_name}(uint8_t* buf, size_t size) {{\n")
-	file.write(f"            for(size_t i = 0; i < size;){{\n")
-	file.write(f"                i++;\n")
-	file.write(f"                switch(buf[i - 1]){{\n")
+	file.write(f"\t\t{class_name}(uint8_t* buf, size_t size) {{\n")
+	file.write(f"\t\t\tfor(size_t i = 0; i < size;){{\n")
+	file.write(f"\t\t\t\tiota::index_type index = buf[i];\n")
+	file.write(f"\t\t\t\ti++;\n")
+	file.write(f"\t\t\t\tswitch(index){{\n")
 
 	for field in message.items:
-		file.write(f"                // {field.type}\n")
-		file.write(f"                case {field.index}: {{\n")
-		if field.type == 'uint8':
-			file.write(f"                    this->{field_internal_names[field.index]} = buf[i];\n")
-			file.write(f"                    i++; // 1 byte size beyond the index\n")
-		elif field.type == 'uint16':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8));\n")
-			file.write(f"                    i += 2;\n")
-		elif field.type == 'uint32':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8) | (({get_message_native_type(field.type)})buf[i + 2] << 16) | (({get_message_native_type(field.type)})buf[i + 3] << 24));\n")
-			file.write(f"                    i += 4;\n")
-		elif field.type == 'uint64':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8) | (({get_message_native_type(field.type)})buf[i + 2] << 16) | (({get_message_native_type(field.type)})buf[i + 3] << 24) | (({get_message_native_type(field.type)})buf[i + 4] << 32) | (({get_message_native_type(field.type)})buf[i + 5] << 40) | (({get_message_native_type(field.type)})buf[i + 6] << 48) | (({get_message_native_type(field.type)})buf[i + 7] << 56));\n")
-			file.write(f"                    i += 8;\n")
-		elif field.type == 'int8':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})buf[i];\n")
-			file.write(f"                    i++; // 1 byte size beyond the index\n")
-		elif field.type == 'int16':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8));\n")
-			file.write(f"                    i += 2;\n")
-		elif field.type == 'int32':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8) | (({get_message_native_type(field.type)})buf[i + 2] << 16) | (({get_message_native_type(field.type)})buf[i + 3] << 24));\n")
-			file.write(f"                    i += 4;\n")
-		elif field.type == 'int64':
-			file.write(f"                    this->{field_internal_names[field.index]} = ({get_message_native_type(field.type)})(buf[i] | (({get_message_native_type(field.type)})buf[i + 1] << 8) | (({get_message_native_type(field.type)})buf[i + 2] << 16) | (({get_message_native_type(field.type)})buf[i + 3] << 24) | (({get_message_native_type(field.type)})buf[i + 4] << 32) | (({get_message_native_type(field.type)})buf[i + 5] << 40) | (({get_message_native_type(field.type)})buf[i + 6] << 48) | (({get_message_native_type(field.type)})buf[i + 7] << 56));\n")
-			file.write(f"                    i += 8;\n")
-		elif field.type == 'string':
-			file.write(f"                    size_t size = (size_t)(buf[i] | ((size_t)buf[i + 1] << 8) | ((size_t)buf[i + 2] << 16) | ((size_t)buf[i + 3] << 24) | ((size_t)buf[i + 4] << 32) | ((size_t)buf[i + 5] << 40) | ((size_t)buf[i + 6] << 48) | ((size_t)buf[i + 7] << 56));\n")
-			file.write(f"                    i += 8;\n")
-			file.write(f"                    this->{field_internal_names[field.index]} = iota::create_string();\n")
-			file.write(f"                    this->{field_internal_names[field.index]}->resize(size);\n")
-			file.write(f"                    for(size_t j = 0; j < size; j++)\n")
-			file.write(f"                        this->{field_internal_names[field.index]}->operator[](j) = buf[i + j];\n")
-			file.write(f"                    i += size;\n")
-		elif field.type == 'buffer':
-			file.write(f"                    size_t size = (size_t)(buf[i] | ((size_t)buf[i + 1] << 8) | ((size_t)buf[i + 2] << 16) | ((size_t)buf[i + 3] << 24) | ((size_t)buf[i + 4] << 32) | ((size_t)buf[i + 5] << 40) | ((size_t)buf[i + 6] << 48) | ((size_t)buf[i + 7] << 56));\n")
-			file.write(f"                    i += 8;\n")
-			file.write(f"                    this->{field_internal_names[field.index]} = iota::create_vector<uint8_t>();\n")
-			file.write(f"                    for(size_t j = 0; j < size; j++)\n")
-			file.write(f"                        this->{field_internal_names[field.index]}->push_back(buf[i + j]);\n")
-			file.write(f"                    i += size;\n")
-		
-		file.write(f"                    break;\n")
-		file.write(f"                }}\n")
+		file.write(f"\t\t\t\t// {field.type}\n")
+		file.write(f"\t\t\t\tcase {field.index}: {{\n")
+		file.write(f"\t\t\t\t\tthis->_p_{field.name} = true;\n")# {field_internal_names[field.index]} = {get_message_default_initializer(field.type)};\n")
+		file.write(f"\t\t\t\t\ti += iota::parse_item<{get_message_native_type(field.type)}>(&buf[i], this->_m_{field.name});\n")
+		file.write(f"\t\t\t\t\tbreak;\n")
+		file.write(f"\t\t\t\t}}\n")
 
 
-	file.write(f"                }}\n")
-	file.write(f"            }}\n")
-	file.write(f"        }}\n")
+	file.write(f"\t\t\t\t}}\n")
+	file.write(f"\t\t\t}}\n")
+	file.write(f"\t\t}}\n")
 
 	for field in message.items:
 		name = field.name
 		native_type = get_message_native_type(field.type)
 
-		file.write(f"        {native_type}& get_{name}() {{\n")
-		file.write(f"            return *this->{field_internal_names[field.index]};\n")
-		file.write(f"        }}\n")
+		file.write(f"\t\t{native_type}& get_{name}() {{\n")
+		file.write(f"\t\t\treturn this->_m_{field.name};\n")
+		file.write(f"\t\t}}\n")
 
-		file.write(f"        bool has_{name}() {{\n")
-		file.write(f"            return this->{field_internal_names[field.index]}.has_value();\n")
-		file.write(f"        }}\n")
+		file.write(f"\t\tbool has_{name}() {{\n")
+		file.write(f"\t\t\treturn this->_p_{field.name};\n")
+		file.write(f"\t\t}}\n")
 
-	file.write(f"    private:\n")
+	file.write(f"\tprivate:\n")
 	for field in message.items:
 		name = field.name
 		native_type = get_message_native_type(field.type)
 		
-		file.write(f"        iota::optional<{native_type}> _{name};\n")
+		file.write(f"\t\t{native_type} _m_{name} = {get_message_default_initializer(field.type)}; bool _p_{name} = false;\n")
 
-	file.write(f"    }};\n\n")
+	file.write(f"\t}};\n\n")
 
 def get_enum_native_type(type):
 	dictionary = {
@@ -147,12 +122,12 @@ def get_enum_native_type(type):
 	return dictionary.get(type)
 
 def generate_enum(file, enum):
-	file.write(f"    enum class {enum.name} : {get_enum_native_type(enum.item_type)} {{\n")
+	file.write(f"\tenum class {enum.name} : {get_enum_native_type(enum.item_type)} {{\n")
 
 	for entry in enum.items:
-		file.write(f"        {entry.name} = {entry.value},\n")
+		file.write(f"\t\t{entry.name} = {entry.value},\n")
 
-	file.write(f"    }};\n\n")
+	file.write(f"\t}};\n\n")
 
 def copy_file_contents(file1, file2):
 	for line in file1:
@@ -184,6 +159,11 @@ def generate(subgenerator, output, items, module):
 
 	buffer_builder_file = open('lib/cpp/buffer_builder.hpp', 'r')
 	copy_file_contents(buffer_builder_file, file)
+	buffer_builder_file.close()
+
+	buffer_parser_file = open('lib/cpp/buffer_parser.hpp', 'r')
+	copy_file_contents(buffer_parser_file, file)
+	buffer_parser_file.close()
 
 	formatted_module_name = module.replace('.', '::')
 
