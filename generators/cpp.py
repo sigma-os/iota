@@ -37,7 +37,7 @@ def generate_builder(file, message):
 	file.write(f"\tclass {class_name} {{\n")
 	file.write(f"\tpublic:\n")
 
-	file.write(f"\t{class_name}() {{}}\n")
+	file.write(f"\t\t{class_name}(): buf{{}} {{}}\n")
 
 	for field in message.items:
 		name = field.name
@@ -165,9 +165,12 @@ def generate(subgenerator, output, items, module):
 	copy_file_contents(buffer_parser_file, file)
 	buffer_parser_file.close()
 
-	formatted_module_name = module.replace('.', '::')
+	module_parts = module.split('.')
 
-	file.write(f"namespace {formatted_module_name} {{\n")
+	for part in module_parts:
+		file.write(f"namespace [[gnu::visibility(\"hidden\")]] {part} {{ ")
+
+	file.write("\n")
 
 	for item in items:
 		if(item.type == 'message'):
@@ -179,7 +182,8 @@ def generate(subgenerator, output, items, module):
 			print(f"cpp: Unknown item type: {item.type}")
 			exit()
 
-	file.write("}")
+	for part in module_parts:
+		file.write("} ")
 
 	file.close()
 

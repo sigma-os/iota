@@ -10,7 +10,7 @@
 #error "IOTA_FRIGG_GET_ALLOCATOR isn't set"
 #endif
 
-namespace iota
+namespace [[gnu::visibility("hidden")]] iota
 {
     using index_type = uint8_t;
 

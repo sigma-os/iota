@@ -1,4 +1,4 @@
-namespace iota
+namespace [[gnu::visibility("hidden")]] iota
 {
     template<typename T>
     size_t parse_item(uint8_t* data, T& value);

@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-namespace iota
+namespace [[gnu::visibility("hidden")]] iota
 {
     using index_type = uint8_t;
 

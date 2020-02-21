@@ -1,4 +1,4 @@
-namespace iota
+namespace [[gnu::visibility("hidden")]] iota
 {
     class buffer_generator {
     public:
