@@ -153,6 +153,10 @@ def generate(subgenerator, output, items, module):
 		lib_file = open('lib/cpp/lib-frigg.hpp', 'r')
 		copy_file_contents(lib_file, file)
 		lib_file.close()
+	elif subgenerator == 'sigma-kernel':
+		lib_file = open('lib/cpp/lib-sigma-kernel.hpp', 'r')
+		copy_file_contents(lib_file, file)
+		lib_file.close()
 	else:	
 		print(f"cpp: Unknown subgenerator: {subgenerator}")
 		exit()
