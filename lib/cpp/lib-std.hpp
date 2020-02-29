@@ -1,18 +1,9 @@
-#include <optional>
 #include <vector>
 #include <string>
 
 namespace [[gnu::visibility("hidden")]] iota
 {
     using index_type = uint8_t;
-
-    template<typename T>
-    using optional = std::optional<T>;
-
-    template<typename T>
-    optional<T> create_optional(){
-        return {};
-    }
 
     template<typename T>
     using vector = std::vector<T>;

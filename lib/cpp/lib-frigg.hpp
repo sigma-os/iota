@@ -1,4 +1,3 @@
-#include <frg/optional.hpp>
 #include <frg/vector.hpp>
 #include <frg/string.hpp>
 
@@ -13,14 +12,6 @@
 namespace [[gnu::visibility("hidden")]] iota
 {
     using index_type = uint8_t;
-
-    template<typename T>
-    using optional = frg::optional<T>;
-
-    template<typename T>
-    optional<T> create_optional(){
-        return {};
-    }
 
     template<typename T>
     using vector = frg::vector<T, IOTA_FRIGG_ALLOCATOR>;
